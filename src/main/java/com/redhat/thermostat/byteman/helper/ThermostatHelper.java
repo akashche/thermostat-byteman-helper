@@ -86,15 +86,21 @@ public class ThermostatHelper {
         transport.send(rec);
     }
 
-    // todo: add support for choosing ThermostatUnixSocketTransport when its API will be stable
     private static ThermostatTransport createTransport() {
-        int sendThreshold = Integer.parseInt(getProperty("thermostat.send_threshold", "2"));
+        int sendThreshold = Integer.parseInt(getProperty("thermostat.send_threshold", "32"));
         int loseThreshold = Integer.parseInt(getProperty("thermostat.lose_threshold", "1024"));
         String transport = getProperty("thermostat.transport", "json");
-        File outDir = new File(getProperty("thermostat.json_out_directory", "."));
-        String prefix = getProperty("thermostat.json_file_prefix", "");
+        File jsonOutDir = new File(getProperty("thermostat.json_out_directory", "."));
+        String jsonFileprefix = getProperty("thermostat.json_file_prefix", "");
+        File socketPath = new File(getProperty("thermostat.socket_path", "./thermostat-socket"));
+        int socketBatchSize = Integer.parseInt(getProperty("thermostat.socket_batch_size", "8"));
+        int socketAttempts = Integer.parseInt(getProperty("thermostat.socket_attempts", "16"));
+        int socketBreak = Integer.parseInt(getProperty("thermostat.socket_break_millis", "1000"));
         if ("json".equals(transport)) {
-            return new ThermostatJsonFileTransport(sendThreshold, loseThreshold, outDir, prefix);
+            return new ThermostatJsonFileTransport(sendThreshold, loseThreshold, jsonOutDir, jsonFileprefix);
+        } else if ("socket".equals(transport)) {
+            return new ThermostatUnixSocketTransport(sendThreshold, loseThreshold, socketPath, socketBatchSize,
+                    socketAttempts, socketBreak);
         } else {
             throw new UnsupportedOperationException("Invalid transport: [" + transport + "]");
         }

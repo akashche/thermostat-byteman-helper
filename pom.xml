@@ -97,6 +97,29 @@
                                     <version>${version.byteman}</version>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.redhat.thermostat</groupId>
+                                    <artifactId>jnr-unix-socket-test</artifactId>
+                                    <version>${version.thermostat_ipc}</version>
+                                    <overWrite>false</overWrite>
+                                </artifactItem>
+                                <!--<artifactItem>-->
+                                    <!--<groupId>com.github.jnr</groupId>-->
+                                    <!--<artifactId>jnr-unixsocket</artifactId>-->
+                                    <!--<version>0.8</version>-->
+                                    <!--<overWrite>false</overWrite>-->
+                                <!--</artifactItem>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>com.github.jnr</groupId>-->
+                                    <!--<artifactId>jnr-ffi</artifactId>-->
+                                    <!--<version>2.0.3</version>-->
+                                    <!--<overWrite>false</overWrite>-->
+                                <!--</artifactItem>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>com.github.jnr</groupId>-->
+                                    <!--<artifactId>jffi</artifactId>-->
+                                    <!--<version>1.2.9</version>-->
+                                <!--</artifactItem>-->
                             </artifactItems>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>

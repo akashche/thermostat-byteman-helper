@@ -56,8 +56,15 @@ public class ThermostatHelperTest {
                 "-Dthermostat.transport=json",
                 "-Dthermostat.json_out_directory=./target",
                 "-Dthermostat.json_file_prefix=thermostat_",
+//                "-Dthermostat.transport=socket",
+//                "-Dthermostat.socket_path=/tmp/thermostat-socket",
                 "-cp",
-                "./target/test-classes:./target/classes",
+                "./target/test-classes:" +
+                        "./target/classes:" +
+                        "./target/jnr-unix-socket-test-0.0.1.jar",
+//                        "./target/jnr-unixsocket-0.8.jar:" +
+//                        "./target/jnr-ffi-2.0.3.jar:" +
+//                        "./target/jffi-1.2.9.jar",
                 "com.redhat.thermostat.byteman.helper.support.TestApp"
                 ));
         builder.inheritIO();
