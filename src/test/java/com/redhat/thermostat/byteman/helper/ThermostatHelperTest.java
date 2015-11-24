@@ -38,42 +38,30 @@ package com.redhat.thermostat.byteman.helper;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-
-import static com.redhat.thermostat.byteman.helper.ThermostatUtils.closeQuietly;
-import static com.redhat.thermostat.byteman.helper.ThermostatUtils.createTmpDir;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
 
 /**
  * @author akashche
  */
-public class ThermostatJsonFileTransportTest {
-
+public class ThermostatHelperTest {
     @Test
-    public void test() throws IOException {
-        ThermostatTransport transport = null;
-        File tmpDir = null;
-        try {
-            tmpDir = createTmpDir(ThermostatJsonFileTransportTest.class);
-            transport = new ThermostatJsonFileTransport(2, 1024, tmpDir, "foo");
-            transport.send(new ThermostatRecord(42, "foo1", "bar1", "baz1", null));
-            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
-            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
-            ThermostatUtils.sleep(200);
-            File[] written = tmpDir.listFiles();
-            assertTrue("dir access fail", null != written);
-            assertEquals("file written fail", 1, written.length);
-            assertEquals("file data fail", 338, written[0].length());
-            written[0].delete();
-
-        } finally {
-            closeQuietly(transport);
-            if (null != tmpDir) {
-                tmpDir.delete();
-            }
-        }
+    public void test() throws Exception {
+        ProcessBuilder builder = new ProcessBuilder(Arrays.asList(
+                "java",
+                "-javaagent:./target/byteman-3.0.2.jar=script:./src/test/resources/01.btm",
+                "-Dorg.jboss.byteman.verbose",
+                "-Dthermostat.agent_id=agent_orange",
+                "-Dthermostat.send_threshold=2",
+                "-Dthermostat.lose_threshold=1024",
+                "-Dthermostat.transport=json",
+                "-Dthermostat.json_out_directory=./target",
+                "-Dthermostat.json_file_prefix=thermostat_",
+                "-cp",
+                "./target/test-classes:./target/classes",
+                "com.redhat.thermostat.byteman.helper.support.TestApp"
+                ));
+        builder.inheritIO();
+        Process process = builder.start();
+        process.waitFor();
     }
-
 }

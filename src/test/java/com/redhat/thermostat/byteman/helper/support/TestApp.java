@@ -34,46 +34,14 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.byteman.helper;
-
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static com.redhat.thermostat.byteman.helper.ThermostatUtils.closeQuietly;
-import static com.redhat.thermostat.byteman.helper.ThermostatUtils.createTmpDir;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+package com.redhat.thermostat.byteman.helper.support;
 
 /**
  * @author akashche
  */
-public class ThermostatJsonFileTransportTest {
-
-    @Test
-    public void test() throws IOException {
-        ThermostatTransport transport = null;
-        File tmpDir = null;
-        try {
-            tmpDir = createTmpDir(ThermostatJsonFileTransportTest.class);
-            transport = new ThermostatJsonFileTransport(2, 1024, tmpDir, "foo");
-            transport.send(new ThermostatRecord(42, "foo1", "bar1", "baz1", null));
-            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
-            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
-            ThermostatUtils.sleep(200);
-            File[] written = tmpDir.listFiles();
-            assertTrue("dir access fail", null != written);
-            assertEquals("file written fail", 1, written.length);
-            assertEquals("file data fail", 338, written[0].length());
-            written[0].delete();
-
-        } finally {
-            closeQuietly(transport);
-            if (null != tmpDir) {
-                tmpDir.delete();
-            }
-        }
+public class TestApp {
+    public static void main(String[] args) throws Exception {
+        Thread.sleep(200);
+        System.out.println("Application ran");
     }
-
 }

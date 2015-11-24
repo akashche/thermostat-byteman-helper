@@ -40,7 +40,9 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author akashche
@@ -56,7 +58,7 @@ abstract class ThermostatTransport implements Closeable {
     private final Object cacheLock = new Object();
     private long lostCount = 0;
     // executor
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor = Executors.newSingleThreadExecutor(new ThermostatThreadFactory("thermostat"));
 
     /**
      * Constructor for inheritors
@@ -103,11 +105,20 @@ abstract class ThermostatTransport implements Closeable {
     @Override
     public void close() {
         synchronized (cacheLock) {
-            if (!sending.get()) {
+            if (!sending.get() && cache.size() > 0) {
                 TransferTask task = new TransferTask(cache);
                 task.run();
             }
         }
+    }
+
+    /**
+     * Getter for number of lost records
+     *
+     * @return number of lost records
+     */
+    public long getLostCount() {
+        return lostCount;
     }
 
     private class TransferTask implements Runnable {
@@ -130,4 +141,31 @@ abstract class ThermostatTransport implements Closeable {
         }
     }
 
+    private static class ThermostatThreadFactory implements ThreadFactory {
+        private final AtomicInteger counter = new AtomicInteger(0);
+        private final String prefix;
+
+        /**
+         * Constructor
+         *
+         * @param prefix thread name prefix
+         */
+        public ThermostatThreadFactory(String prefix) {
+            this.prefix = prefix;
+        }
+
+        /**
+         * Creates new thread
+         *
+         * @param runnable thread runnable
+         * @return daemon thread with <code>prefix-counter</code> name
+         */
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread thread = new Thread(runnable);
+            thread.setDaemon(true);
+            thread.setName(prefix + "-" + counter.incrementAndGet());
+            return thread;
+        }
+    }
 }

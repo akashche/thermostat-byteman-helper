@@ -36,24 +36,29 @@
 
 package com.redhat.thermostat.byteman.helper;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.LinkedHashMap;
 
 import static com.redhat.thermostat.byteman.helper.ThermostatUtils.toMap;
+import static java.lang.System.getProperty;
 
 /**
- *
+ * Byteman helper that provides "send" method for sending records to Thermostat
  *
  * @author akashche
  */
 public class ThermostatHelper {
     private static final String JVM_ID = ManagementFactory.getRuntimeMXBean().getName();
-    // todo: settings
-    private final String agentId = "TODO";
+    private final String agentId;
     private final ThermostatTransport transport;
 
+    /**
+     * Constructor
+     */
     public ThermostatHelper() {
-        transport = null; // TODO
+        this.agentId = getProperty("thermostat.agent_id", "default");
+        transport = createTransport();
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
@@ -79,6 +84,16 @@ public class ThermostatHelper {
         LinkedHashMap<String, Object> data = toMap(dataArray);
         ThermostatRecord rec = new ThermostatRecord(System.currentTimeMillis(), JVM_ID, agentId, marker, data);
         transport.send(rec);
+    }
+
+    // todo: add support for choosing ThermostatUnixSocketTransport when its API will be stable
+    private static ThermostatTransport createTransport() {
+        int sendThreshold = Integer.parseInt(getProperty("thermostat.send_threshold", "2"));
+        int loseThreshold = Integer.parseInt(getProperty("thermostat.lose_threshold", "1024"));
+        String transport = getProperty("thermostat.transport", "json");
+        File outDir = new File(getProperty("thermostat.json_out_directory", "."));
+        String prefix = getProperty("thermostat.json_file_prefix", "");
+        return new ThermostatJsonFileTransport(sendThreshold, loseThreshold, outDir, prefix);
     }
 
 }

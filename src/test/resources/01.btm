@@ -1,0 +1,16 @@
+RULE 01
+CLASS com.redhat.thermostat.byteman.helper.support.TestApp
+METHOD main
+HELPER com.redhat.thermostat.byteman.helper.ThermostatHelper
+AT ENTRY
+BIND varargs:Object[] = new Object[4];
+IF true
+DO
+    varargs[0] = "foo";
+    varargs[1] = 42;
+    varargs[2] = "bar";
+    varargs[3] = "baz";
+    send("entering main", varargs);
+    send("entering main2", "foo1", 43);
+    send("entering main3", "foo2", 44);
+ENDRULE
