@@ -93,7 +93,11 @@ public class ThermostatHelper {
         String transport = getProperty("thermostat.transport", "json");
         File outDir = new File(getProperty("thermostat.json_out_directory", "."));
         String prefix = getProperty("thermostat.json_file_prefix", "");
-        return new ThermostatJsonFileTransport(sendThreshold, loseThreshold, outDir, prefix);
+        if ("json".equals(transport)) {
+            return new ThermostatJsonFileTransport(sendThreshold, loseThreshold, outDir, prefix);
+        } else {
+            throw new UnsupportedOperationException("Invalid transport: [" + transport + "]");
+        }
     }
 
 }
