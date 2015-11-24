@@ -46,6 +46,10 @@
     <packaging>jar</packaging>
     <name>Byteman Helper for Thermostat</name>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.redhat.thermostat</groupId>

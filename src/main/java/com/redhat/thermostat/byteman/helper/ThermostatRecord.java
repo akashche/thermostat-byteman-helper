@@ -55,6 +55,15 @@ class ThermostatRecord {
     private String marker;
     private LinkedHashMap<String, Object> data;
 
+    /**
+     * Constructor
+     *
+     * @param timestamp timestamp
+     * @param vmId JVM ID
+     * @param agentId Agent ID
+     * @param marker marker value
+     * @param data arbitrary data
+     */
     public ThermostatRecord(long timestamp, String vmId, String agentId, String marker, LinkedHashMap<String, Object> data) {
         this.timestamp = timestamp;
         this.vmId = defaultString(vmId);
@@ -108,14 +117,19 @@ class ThermostatRecord {
         return data;
     }
 
+    /**
+     * Converts this record to JSON string
+     *
+     * @return JSON string
+     */
     String toJson() {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append("    \"timestamp\": ").append(Long.toString(timestamp)).append(",\n");
-        sb.append("    \"vmId\":\"").append(agentId).append("\",\n");
+        sb.append("    \"vmId\": \"").append(agentId).append("\",\n");
         sb.append("    \"agentId\": \"").append(agentId).append("\",\n");
         sb.append("    \"marker\": \"").append(marker).append("\",\n");
-        sb.append("    \"data\": \"{\n");
+        sb.append("    \"data\": {\n");
         boolean first = true;
         for (Map.Entry<String, Object> en : data.entrySet()) {
             if (!first) {
@@ -123,9 +137,9 @@ class ThermostatRecord {
             } else {
                 first = false;
             }
-            sb.append("        \"").append(en.getKey()).append("\": \"").append(toJsonValue(en.getValue()));
+            sb.append("        \"").append(en.getKey()).append("\": ").append(toJsonValue(en.getValue()));
         }
-        sb.append("    }\n");
+        sb.append("\n    }\n");
         sb.append("}");
         return sb.toString();
     }
@@ -144,4 +158,19 @@ class ThermostatRecord {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("ThermostatRecord");
+        sb.append("{timestamp=").append(timestamp);
+        sb.append(", vmId='").append(vmId).append('\'');
+        sb.append(", agentId='").append(agentId).append('\'');
+        sb.append(", marker='").append(marker).append('\'');
+        sb.append(", data=").append(data);
+        sb.append('}');
+        return sb.toString();
+    }
 }
