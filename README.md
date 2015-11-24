@@ -6,14 +6,14 @@ This project implements a Byteman Helper that can transfer records to the Thermo
 Usage example
 -------------
 
-    java -javaagent:path/to/byteman.jar=script:path/to/rules.btm ^
-        -Dorg.jboss.byteman.verbose ^
-        -Dthermostat.agent_id=agent_orange ^
-        -Dthermostat.send_threshold=32 ^
-        -Dthermostat.lose_threshold=1024 ^
-        -Dthermostat.transport=<socket or json> ^
-        -Dthermostat.socket... ^ # more transport props
-        -cp path/to/helper.jar ^
+    java -javaagent:path/to/byteman.jar=script:path/to/rules.btm \
+        -Dorg.jboss.byteman.verbose \
+        -Dthermostat.agent_id=agent_orange \
+        -Dthermostat.send_threshold=32 \
+        -Dthermostat.lose_threshold=1024 \
+        -Dthermostat.transport=<socket or json> \
+        -Dthermostat.socket... \ # more transport props
+        -cp path/to/helper.jar \
         -jar path/to/app.jar
 
 License information
