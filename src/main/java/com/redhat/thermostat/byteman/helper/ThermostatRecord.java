@@ -46,7 +46,6 @@ import static com.redhat.thermostat.byteman.helper.ThermostatUtils.escapeQuotes;
  * Generic record for data collected for Thermostat
  *
  * @author akashche
- * Date: 11/23/15
  */
 class ThermostatRecord {
     private long timestamp;

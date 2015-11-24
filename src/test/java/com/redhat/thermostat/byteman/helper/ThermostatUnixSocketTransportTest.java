@@ -36,26 +36,33 @@
 
 package com.redhat.thermostat.byteman.helper;
 
+import org.junit.Test;
+
+import java.io.File;
+
+import static com.redhat.thermostat.byteman.helper.ThermostatUtils.closeQuietly;
+
 /**
  * @author akashche
  */
-public class ThermostatException extends RuntimeException {
-    /**
-     * Constructor
-     *
-     * @param message error message
-     */
-    public ThermostatException(String message) {
-        super(message);
+public class ThermostatUnixSocketTransportTest {
+    @Test
+    public void testDummy() {
+        // JUnit requires at least one test method
     }
 
-    /**
-     * Constructor
-     *
-     * @param message error message
-     * @param cause cause exception
-     */
-    public ThermostatException(String message, Throwable cause) {
-        super(message, cause);
+//    @Test
+    public void test() {
+        ThermostatTransport transport = null;
+        try {
+            transport = new ThermostatUnixSocketTransport(2, 1024, new File("/tmp/thermostat-socket"), 2, 16, 1000);
+            transport.send(new ThermostatRecord(42, "foo1", "bar1", "baz1", null));
+            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
+            transport.send(new ThermostatRecord(43, "foo1", "bar1", "baz1", null));
+            ThermostatUtils.sleep(200);
+        } finally {
+            closeQuietly(transport);
+        }
     }
+
 }

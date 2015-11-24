@@ -45,7 +45,6 @@ import static com.redhat.thermostat.byteman.helper.ThermostatUtils.toMap;
  *
  *
  * @author akashche
- * Date: 11/23/15
  */
 public class ThermostatHelper {
     private static final String JVM_ID = ManagementFactory.getRuntimeMXBean().getName();

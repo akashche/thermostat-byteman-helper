@@ -45,8 +45,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Transport implementation that sends records to the Thermostat agent over
+ * Thermostat local IPC
+ *
  * @author akashche
- * Date: 11/23/15
  */
 class ThermostatUnixSocketTransport extends ThermostatTransport {
     private final File socket;
@@ -55,6 +57,16 @@ class ThermostatUnixSocketTransport extends ThermostatTransport {
     private final long breakIntervalMillis;
     private final ThermostatLocalSocketChannel channel;
 
+    /**
+     * Constructor
+     *
+     * @param sendThreshold min number of records to cache before sending
+     * @param loseThreshold max number of packages to cache
+     * @param socket path to socket
+     * @param batchSize number of records to send at once
+     * @param attempts number of send attempts to repeat in case of error
+     * @param breakIntervalMillis number of milliseconds to wait between the attempts
+     */
     protected ThermostatUnixSocketTransport(int sendThreshold, int loseThreshold, File socket, int batchSize, int attempts, long breakIntervalMillis) {
         super(sendThreshold, loseThreshold);
         this.batchSize = batchSize;
@@ -71,6 +83,12 @@ class ThermostatUnixSocketTransport extends ThermostatTransport {
         }
     }
 
+    /**
+     * Sends specified records o the Thermostat agent over
+     * Thermostat local IPC
+     *
+     * @param records records to transfer
+     */
     @Override
     protected void transferToThermostat(ArrayList<ThermostatRecord> records) {
         List<Exception> exList = new ArrayList<>();
@@ -87,6 +105,20 @@ class ThermostatUnixSocketTransport extends ThermostatTransport {
                 " attempts count: [" + attempts + "], breakIntervalMillis: [" + breakIntervalMillis + "]");
         for (Exception ex : exList) {
             ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Sends cached records and closes the channel
+     */
+    @Override
+    public void close() {
+        super.close();
+        try {
+            channel.close();
+        } catch (IOException e) {
+            System.err.println("WARNING: Thermostat error closing socket channel: [" + socket.getAbsolutePath() + "]");
+            e.printStackTrace();
         }
     }
 
@@ -116,7 +148,7 @@ class ThermostatUnixSocketTransport extends ThermostatTransport {
             }
             sb.append(rec.toJson());
         }
-        sb.append("]");
+        sb.append("\n]");
         ByteBuffer envelope = ByteBuffer.wrap(sb.toString().getBytes(Charset.forName("UTF-8")));
         channel.write(envelope);
     }

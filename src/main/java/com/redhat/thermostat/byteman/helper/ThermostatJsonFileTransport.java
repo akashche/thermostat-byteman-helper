@@ -39,16 +39,27 @@ package com.redhat.thermostat.byteman.helper;
 import java.io.*;
 import java.util.ArrayList;
 
+import static com.redhat.thermostat.byteman.helper.ThermostatUtils.closeQuietly;
 import static com.redhat.thermostat.byteman.helper.ThermostatUtils.defaultString;
 
 /**
+ * Transport implementation that writes the records into the
+ * JSON files in the specified directory
+ *
  * @author akashche
- * Date: 11/23/15
  */
 class ThermostatJsonFileTransport extends ThermostatTransport {
     private final File directory;
     private final String prefix;
 
+    /**
+     * Constructor
+     *
+     * @param sendThreshold min number of records to cache before sending
+     * @param loseThreshold max number of packages to cache
+     * @param directory directory in FS to write file into
+     * @param prefix prefix for the file name
+     */
     protected ThermostatJsonFileTransport(int sendThreshold, int loseThreshold, File directory, String prefix) {
         super(sendThreshold, loseThreshold);
         if (!directory.isDirectory()) {
@@ -61,6 +72,11 @@ class ThermostatJsonFileTransport extends ThermostatTransport {
         this.prefix = defaultString(prefix);
     }
 
+    /**
+     * Writes specified records to the JSON file
+     *
+     * @param records records to transfer
+     */
     @Override
     protected void transferToThermostat(ArrayList<ThermostatRecord> records) {
         File file = new File(directory, prefix + System.currentTimeMillis() + ".json");
@@ -77,8 +93,10 @@ class ThermostatJsonFileTransport extends ThermostatTransport {
                 }
                 writer.write(rec.toJson());
             }
-            writer.write("]");
+            writer.write("\n]");
+            writer.close();
         } catch (Exception e) {
+            closeQuietly(writer);
             System.err.println("ERROR: error saving Thermostat records to JSON file: [" + file.getAbsolutePath() + "]");
             e.printStackTrace();
         }

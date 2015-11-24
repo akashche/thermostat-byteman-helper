@@ -38,48 +38,61 @@ package com.redhat.thermostat.byteman.helper;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author akashche
  */
-public class ThermostatRecordTest {
-    @Test
-    public void testToJson() {
-        ThermostatRecord recEmptyData = new ThermostatRecord(42, "foo", "bar", "baz", null);
-        assertEquals("empty data fail",
-                "{\n" +
-                "    \"timestamp\": 42,\n" +
-                "    \"vmId\": \"bar\",\n" +
-                "    \"agentId\": \"bar\",\n" +
-                "    \"marker\": \"baz\",\n" +
-                "    \"data\": {\n" +
-                "\n    }\n" +
-                "}", recEmptyData.toJson());
+public class ThermostatUtilsTest {
 
-        LinkedHashMap<String, Object> data = new LinkedHashMap<>();
-        data.put("foo1", "ba\"r1");
-        data.put("foo2", 42);
-        data.put("foo3", 42.000);
-        data.put("foo4", false);
-        data.put("foo5", new ArrayList<String>());
-        ThermostatRecord recData = new ThermostatRecord(42, "foo", "bar", "baz", data);
-        assertEquals("data fail",
-                "{\n" +
-                "    \"timestamp\": 42,\n" +
-                "    \"vmId\": \"bar\",\n" +
-                "    \"agentId\": \"bar\",\n" +
-                "    \"marker\": \"baz\",\n" +
-                "    \"data\": {\n" +
-                "        \"foo1\": \"ba\\\"r1\",\n" +
-                "        \"foo2\": 42,\n" +
-                "        \"foo3\": 42.0,\n" +
-                "        \"foo4\": false,\n" +
-                "        \"foo5\": \"[]\"\n" +
-                "    }\n" +
-                "}", recData.toJson());
+    @Test
+    public void testDefaultString() {
+        assertEquals("null string fail", "", ThermostatUtils.defaultString(null));
+        assertEquals("empty string fail", "", ThermostatUtils.defaultString(""));
+        assertEquals("non-empty string fail", "foo", ThermostatUtils.defaultString("foo"));
     }
+
+    @Test
+    public void testSleep() {
+        long start = System.currentTimeMillis();
+        ThermostatUtils.sleep(100);
+        assertTrue("sleep fail", System.currentTimeMillis() - start >= 100);
+    }
+
+    @Test
+    public void testEscapeQuotes() {
+        assertEquals("no escape fail", "foo", ThermostatUtils.escapeQuotes("foo"));
+        assertEquals("single string fail", "fo\\\"o", ThermostatUtils.escapeQuotes("fo\"o"));
+        assertEquals("double escape fail", "\\\"\\\"foo", ThermostatUtils.escapeQuotes("\"\"foo"));
+    }
+
+    @Test
+    public void testToMap() {
+        LinkedHashMap<String, Object> map = ThermostatUtils.toMap(new Object[]{"foo", "bar", "baz", 42, null, null});
+        assertEquals("size fail", 3, map.size());
+        assertEquals("data fail", "bar", map.get("foo"));
+        assertEquals("data fail", 42, map.get("baz"));
+        assertEquals("empty fail", null, map.get(""));
+    }
+
+    @Test
+    public void testCreateTmpDir() throws IOException {
+        File dir = null;
+        try {
+            dir = ThermostatUtils.createTmpDir(ThermostatUtilsTest.class);
+            assertTrue("dir existence error", dir.isDirectory());
+        } finally {
+            if (null != dir) {
+                dir.delete();
+            }
+        }
+
+    }
+
+
 }

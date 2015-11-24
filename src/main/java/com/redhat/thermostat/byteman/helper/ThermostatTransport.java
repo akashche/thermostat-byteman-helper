@@ -44,7 +44,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author akashche
- * Date: 11/23/15
  */
 abstract class ThermostatTransport implements Closeable {
     // settings
@@ -59,11 +58,24 @@ abstract class ThermostatTransport implements Closeable {
     // executor
     private final Executor executor = Executors.newSingleThreadExecutor();
 
+    /**
+     * Constructor for inheritors
+     *
+     * @param sendThreshold min number of records to cache before sending
+     * @param loseThreshold max number of packages to cache
+     */
     protected ThermostatTransport(int sendThreshold, int loseThreshold) {
         this.sendThreshold = sendThreshold;
         this.loseThreshold = loseThreshold;
     }
 
+    /**
+     * This method should transfer specified records to Thermostat
+     * It will be called from the background thread and no more than from
+     * a single thread simultaneously
+     *
+     * @param records records to transfer
+     */
     protected abstract void transferToThermostat(ArrayList<ThermostatRecord> records);
 
     public void send(ThermostatRecord rec) {
@@ -72,7 +84,7 @@ abstract class ThermostatTransport implements Closeable {
                 int size = cache.size();
                 if (size < loseThreshold) {
                     cache.add(rec);
-                    if (size >= sendThreshold) {
+                    if (size >= sendThreshold && !sending.get()) {
                         ArrayList<ThermostatRecord> records = cache;
                         cache = new ArrayList<>();
                         TransferTask task = new TransferTask(records);
@@ -85,13 +97,16 @@ abstract class ThermostatTransport implements Closeable {
         }
     }
 
+    /**
+     * Sends the remaining cached records to Thermostat
+     */
     @Override
     public void close() {
         synchronized (cacheLock) {
-            ArrayList<ThermostatRecord> records = cache;
-            cache = new ArrayList<>();
-            TransferTask task = new TransferTask(records);
-            executor.execute(task);
+            if (!sending.get()) {
+                TransferTask task = new TransferTask(cache);
+                task.run();
+            }
         }
     }
 

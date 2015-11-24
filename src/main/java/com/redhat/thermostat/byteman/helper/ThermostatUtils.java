@@ -36,16 +36,19 @@
 
 package com.redhat.thermostat.byteman.helper;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.System.currentTimeMillis;
 
 /**
  * Common utility functions
  *
  * @author akashche
- * Date: 11/23/15
  */
 class ThermostatUtils {
     /**
@@ -110,5 +113,36 @@ class ThermostatUtils {
             map.put(objKey.toString(), dataArray[i + 1]);
         }
         return map;
+    }
+
+    /**
+     * Creates temporary directory for given class
+     *
+     * @param clazz name of this class will be used in dir name
+     * @return created directory
+     * @throws IOException creation error
+     */
+    static File createTmpDir(Class<?> clazz) throws IOException {
+        File baseDir = new File(System.getProperty("java.io.tmpdir"));
+        String baseName = clazz.getName() + "_" + currentTimeMillis() + ".tmp";
+        File tmp = new File(baseDir, baseName);
+        boolean res = tmp.mkdirs();
+        if (!res) throw new IOException("Cannot create directory: [" + tmp.getAbsolutePath() + "]");
+        return tmp;
+    }
+
+    /**
+     * Closes specified closeable without throwing exceptions
+     *
+     * @param closeable closeable instance to close
+     */
+    static void closeQuietly(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
 }
