@@ -36,15 +36,21 @@
 
 package com.redhat.thermostat.byteman.helper;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Common utility functions
+ *
  * @author akashche
  * Date: 11/23/15
  */
 class ThermostatUtils {
+    /**
+     * Regex for escaping quotes in generated JSON
+     */
     private static final Pattern QUOTE_PATTERN = Pattern.compile("\"");
 
     /**
@@ -58,6 +64,11 @@ class ThermostatUtils {
         return str != null ? str : "";
     }
 
+    /**
+     * Thread#sleep call without checked exceptions
+     *
+     * @param millis number of milliseconds to sleep
+     */
     static void sleep(long millis) {
         try {
             Thread.sleep(millis);
@@ -66,19 +77,31 @@ class ThermostatUtils {
         }
     }
 
+    /**
+     * Escapes all quotes with "\" in specified string
+     *
+     * @param str input string
+     * @return string with escaped quotes
+     */
     static String escapeQuotes(String str) {
         if (null != str) {
-            Matcher matcher = QUOTE_PATTERN.matcher(str);
-            if (matcher.matches()) {
-                return matcher.replaceAll("\\\"");
-            }
+            return QUOTE_PATTERN.matcher(str).replaceAll("\\\\\"");
         }
         return str;
     }
 
+    /**
+     * Converts "key1, value1, key2, value2" array into
+     * "key1->value, key2->value2" map
+     *
+     * @param dataArray input array with even number of elements
+     * @return constructed map
+     */
     static LinkedHashMap<String, Object> toMap(Object[] dataArray){
-        LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
-        if (0 != dataArray.length % 2) throw new ThermostatException("Invalid odd elements count");
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        if (0 != dataArray.length % 2) {
+            throw new ThermostatException("Invalid odd elements count in array: [" + Arrays.toString(dataArray) + "]");
+        }
         for (int i = 0; i < dataArray.length; i += 2) {
             Object objKey = dataArray[i];
             if (null == objKey) {
