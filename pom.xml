@@ -49,16 +49,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.byteman>3.0.2</version.byteman>
-        <version.thermostat_ipc>0.0.1</version.thermostat_ipc>
         <version.junit>4.10</version.junit>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.redhat.thermostat</groupId>
-            <artifactId>jnr-unix-socket-test</artifactId>
-            <version>${version.thermostat_ipc}</version>
-        </dependency>
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
@@ -97,12 +91,12 @@
                                     <version>${version.byteman}</version>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.redhat.thermostat</groupId>
-                                    <artifactId>jnr-unix-socket-test</artifactId>
-                                    <version>${version.thermostat_ipc}</version>
-                                    <overWrite>false</overWrite>
-                                </artifactItem>
+                                <!--<artifactItem>-->
+                                    <!--<groupId>com.redhat.thermostat</groupId>-->
+                                    <!--<artifactId>jnr-unix-socket-test</artifactId>-->
+                                    <!--<version>${version.thermostat_ipc}</version>-->
+                                    <!--<overWrite>false</overWrite>-->
+                                <!--</artifactItem>-->
                                 <!--<artifactItem>-->
                                     <!--<groupId>com.github.jnr</groupId>-->
                                     <!--<artifactId>jnr-unixsocket</artifactId>-->

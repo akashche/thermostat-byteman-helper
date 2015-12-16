@@ -36,13 +36,29 @@
 
 package com.redhat.thermostat.byteman.helper;
 
-import com.redhat.thermostat.experimental.ThermostatLocalSocketChannel;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Mock class to allow compilation of ThermostatUnixSocketTransport
+ * without depending on yet-unreleased IPC lib
+ */
+class ThermostatLocalSocketChannel {
+    static ThermostatLocalSocketChannel open(File file) {
+        throw new UnsupportedOperationException("open");
+    }
+
+    void close() throws IOException {
+        throw new UnsupportedOperationException("close");
+    }
+
+    void write(ByteBuffer buffer) {
+        throw new UnsupportedOperationException("write");
+    }
+}
 
 /**
  * Transport implementation that sends records to the Thermostat agent over
@@ -77,7 +93,7 @@ class ThermostatUnixSocketTransport extends ThermostatTransport {
         }
         this.socket = socket;
         try {
-            this.channel = ThermostatLocalSocketChannel.open((socket));
+            this.channel = ThermostatLocalSocketChannel.open(socket);
         } catch (Exception e) {
             throw new ThermostatException("Error opening Thermostat socket: [" + socket.getAbsolutePath() + "]", e);
         }

@@ -38,6 +38,7 @@ package com.redhat.thermostat.byteman.helper;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -48,6 +49,7 @@ public class ThermostatHelperTest {
     public void test() throws Exception {
         ProcessBuilder builder = new ProcessBuilder(Arrays.asList(
                 "java",
+                "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
                 "-javaagent:./target/byteman-3.0.2.jar=script:./src/test/resources/01.btm",
                 "-Dorg.jboss.byteman.verbose",
                 "-Dthermostat.agent_id=agent_orange",
@@ -60,8 +62,8 @@ public class ThermostatHelperTest {
 //                "-Dthermostat.socket_path=/tmp/thermostat-socket",
                 "-cp",
                 "./target/test-classes:" +
-                        "./target/classes:" +
-                        "./target/jnr-unix-socket-test-0.0.1.jar",
+                        "./target/classes",
+//                        "./target/jnr-unix-socket-test-0.0.1.jar",
 //                        "./target/jnr-unixsocket-0.8.jar:" +
 //                        "./target/jnr-ffi-2.0.3.jar:" +
 //                        "./target/jffi-1.2.9.jar",

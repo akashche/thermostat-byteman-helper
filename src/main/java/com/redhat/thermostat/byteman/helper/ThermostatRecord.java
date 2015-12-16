@@ -125,7 +125,7 @@ class ThermostatRecord {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append("    \"timestamp\": ").append(Long.toString(timestamp)).append(",\n");
-        sb.append("    \"vmId\": \"").append(agentId).append("\",\n");
+        sb.append("    \"vmId\": \"").append(vmId).append("\",\n");
         sb.append("    \"agentId\": \"").append(agentId).append("\",\n");
         sb.append("    \"marker\": \"").append(marker).append("\",\n");
         sb.append("    \"data\": {\n");

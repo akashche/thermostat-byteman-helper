@@ -53,7 +53,7 @@ public class ThermostatRecordTest {
         assertEquals("empty data fail",
                 "{\n" +
                 "    \"timestamp\": 42,\n" +
-                "    \"vmId\": \"bar\",\n" +
+                "    \"vmId\": \"foo\",\n" +
                 "    \"agentId\": \"bar\",\n" +
                 "    \"marker\": \"baz\",\n" +
                 "    \"data\": {\n" +
@@ -70,7 +70,7 @@ public class ThermostatRecordTest {
         assertEquals("data fail",
                 "{\n" +
                 "    \"timestamp\": 42,\n" +
-                "    \"vmId\": \"bar\",\n" +
+                "    \"vmId\": \"foo\",\n" +
                 "    \"agentId\": \"bar\",\n" +
                 "    \"marker\": \"baz\",\n" +
                 "    \"data\": {\n" +
